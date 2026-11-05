@@ -10,7 +10,7 @@ const net = require('node:net');
 const path = require('node:path');
 
 // La app se muestra como «Muse»; los datos siguen en una carpeta propia para no mezclarlos con otras apps.
-app.setPath('userData', path.join(app.getPath('appData'), 'muse-mcp-desktop'));
+app.setPath('userData', process.env.MUSE_MCP_USERDATA || path.join(app.getPath('appData'), 'muse-mcp-desktop'));
 app.setName('Muse');
 if (process.platform === 'linux') app.setDesktopName('muse-mcp-desktop.desktop');
 
@@ -18,7 +18,6 @@ const MUSE_URL = process.env.MUSE_URL || 'https://muse.ai/';
 const PARTITION = 'persist:muse';
 const PANEL_OPEN_W = 480;
 const PANEL_CLOSED_W = 36;
-const POPUP_HOSTS = /(^|\.)(muse\.ai|meta\.com|facebook\.com|instagram\.com|google\.com|apple\.com|microsoft\.com|live\.com)$/i;
 
 let win = null;
 let museView = null;
@@ -174,18 +173,32 @@ function createWindow() {
   win.contentView.addChildView(museView);
   win.contentView.addChildView(panelView);
 
-  // Muse: solo http(s); las ventanas emergentes de inicio de sesión se permiten en dominios conocidos, el resto va al navegador del sistema.
-  museView.webContents.setWindowOpenHandler(({ url }) => {
+  // Ventanas emergentes de Muse (p. ej. la autorización OAuth del Master MCP): se abren dentro de la app, con la misma
+  // sesión y conservando la relación con Muse (la ventana puede volver a Muse al terminar). Muchos sitios abren primero
+  // «about:blank» y luego navegan, así que también se permite. Solo http(s); otros esquemas seguros van al sistema.
+  const popupOptions = () => ({
+    width: 560, height: 760, autoHideMenuBar: true, title: 'Muse',
+    ...(iconFile ? { icon: iconFile } : {}),
+    webPreferences: { partition: PARTITION, sandbox: true, contextIsolation: true, nodeIntegration: false }
+  });
+  const popupHandler = ({ url }) => {
     try {
+      if (url === 'about:blank') return { action: 'allow', overrideBrowserWindowOptions: popupOptions() };
       const u = new URL(url);
-      if (u.protocol === 'https:' && POPUP_HOSTS.test(u.hostname)) {
-        return { action: 'allow', overrideBrowserWindowOptions: { width: 520, height: 720, webPreferences: { partition: PARTITION, sandbox: true, contextIsolation: true } } };
-      }
-      if (u.protocol === 'https:' || u.protocol === 'http:') shell.openExternal(u.href);
+      if (u.protocol === 'https:' || u.protocol === 'http:') return { action: 'allow', overrideBrowserWindowOptions: popupOptions() };
+      if (u.protocol === 'mailto:') shell.openExternal(u.href);
     } catch { /* URL inválida */ }
     return { action: 'deny' };
+  };
+  const guardNavigation = (contents) => {
+    contents.on('will-navigate', (e, url) => { if (!/^https?:/i.test(url) && url !== 'about:blank') e.preventDefault(); });
+  };
+  museView.webContents.setWindowOpenHandler(popupHandler);
+  guardNavigation(museView.webContents);
+  museView.webContents.on('did-create-window', (child) => {   // las ventanas emergentes pueden abrir otras y se vigilan igual
+    child.webContents.setWindowOpenHandler(popupHandler);
+    guardNavigation(child.webContents);
   });
-  museView.webContents.on('will-navigate', (e, url) => { if (!/^https?:/i.test(url)) e.preventDefault(); });
   panelView.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   panelView.webContents.on('will-navigate', (e) => e.preventDefault());
 
