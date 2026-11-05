@@ -9,6 +9,11 @@ const fs = require('node:fs');
 const net = require('node:net');
 const path = require('node:path');
 
+// La app se muestra como «Muse»; los datos siguen en una carpeta propia para no mezclarlos con otras apps.
+app.setPath('userData', path.join(app.getPath('appData'), 'muse-mcp-desktop'));
+app.setName('Muse');
+if (process.platform === 'linux') app.setDesktopName('muse-mcp-desktop.desktop');
+
 const MUSE_URL = process.env.MUSE_URL || 'https://muse.ai/';
 const PARTITION = 'persist:muse';
 const PANEL_OPEN_W = 480;
@@ -158,7 +163,9 @@ function createWindow() {
   let pos = {};
   if (target) pos = { x: target.bounds.x + Math.max(0, Math.round((target.bounds.width - size.width) / 2)), y: target.bounds.y + Math.max(0, Math.round((target.bounds.height - size.height) / 2)) };
   else if (saved && typeof saved.x === 'number' && screen.getAllDisplays().some((d) => saved.x >= d.bounds.x && saved.x < d.bounds.x + d.bounds.width)) pos = { x: saved.x, y: saved.y, width: saved.width, height: saved.height };
-  win = new BaseWindow({ ...size, ...pos, minWidth: 760, minHeight: 520, title: 'Muse MCP Desktop' });
+  const iconFile = [process.env.MUSE_MCP_ICON, path.join(app.getAppPath(), 'build', 'icon.png')].find((f) => f && fs.existsSync(f));
+  win = new BaseWindow({ ...size, ...pos, minWidth: 760, minHeight: 520, title: 'Muse', autoHideMenuBar: true, ...(iconFile ? { icon: iconFile } : {}) });
+  win.setMenuBarVisibility(false);   // sin barra de menús; los atajos (Ctrl+Mayús+M, zoom, recargar) siguen activos
 
   museView = new WebContentsView({ webPreferences: { partition: PARTITION, sandbox: true, contextIsolation: true, nodeIntegration: false } });
   panelView = new WebContentsView({
@@ -194,7 +201,7 @@ function createWindow() {
 
 function buildMenu() {
   const template = [
-    { label: 'Archivo', submenu: [{ label: 'Salir', role: 'quit' }] },
+    { label: 'Archivo', submenu: [{ label: 'Salir', role: 'quit', accelerator: 'CommandOrControl+Q' }] },
     { label: 'Ver', submenu: [
       { label: 'Mostrar/ocultar panel Master MCP', accelerator: 'CommandOrControl+Shift+M', click: () => setPanel(!panelOpen) },
       { label: 'Recargar Muse', accelerator: 'CommandOrControl+R', click: () => museView && museView.webContents.reload() },

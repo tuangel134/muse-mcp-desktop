@@ -8,10 +8,11 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PREFIX="${MUSE_MCP_PREFIX:-$HOME/.local/opt/muse-mcp-desktop}"
 BIN="$HOME/.local/bin/muse-mcp-desktop"
 DESKTOP="$HOME/.local/share/applications/muse-mcp-desktop.desktop"
-ICON="$HOME/.local/share/icons/hicolor/512x512/apps/muse-mcp-desktop.png"
+ICONS="$HOME/.local/share/icons/hicolor"
+OLD_MUSE_ICON="$ICONS/512x512/apps/muse.png"   # si ya tienes un icono «muse» en tu tema, se reutiliza
 
 if [ "${1:-}" = "--uninstall" ]; then
-    rm -rf "$PREFIX"; rm -f "$BIN" "$DESKTOP" "$ICON"
+    rm -rf "$PREFIX"; rm -f "$BIN" "$DESKTOP" "$ICONS"/*/apps/muse-mcp-desktop.png
     command -v update-desktop-database >/dev/null && update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
     echo "Desinstalada. Tus datos siguen en ~/.config/muse-mcp-desktop (bórralos a mano si quieres)."
     exit 0
@@ -33,8 +34,17 @@ cp "$SRC/host/host.cjs" "$PREFIX/host/"
 cp "$SRC/package.json" "$SRC/LICENSE" "$SRC/LICENSE-TESSARION-MasterMCP-Lite" "$SRC/THIRD_PARTY.md" "$PREFIX/"
 cp -r "$SRC/node_modules/@ngrok" "$PREFIX/node_modules/"
 
-mkdir -p "$(dirname "$BIN")" "$(dirname "$DESKTOP")" "$(dirname "$ICON")"
-cp "$SRC/build/icon.png" "$ICON"
+mkdir -p "$(dirname "$BIN")" "$(dirname "$DESKTOP")" "$PREFIX/build"
+# Icono: MUSE_ICON (ruta a un PNG) > icono «muse» ya instalado en tu tema > icono neutro del proyecto.
+APP_ICON="${MUSE_ICON:-}"
+[ -z "$APP_ICON" ] && [ -f "$OLD_MUSE_ICON" ] && APP_ICON="$OLD_MUSE_ICON"
+[ -z "$APP_ICON" ] && APP_ICON="$SRC/build/icon.png"
+cp "$APP_ICON" "$PREFIX/build/icon.png"
+for dir in "$ICONS"/*/apps; do   # mismos tamaños que el icono «muse» existente, si los hay
+    [ -f "$dir/muse.png" ] && cp "$dir/muse.png" "$dir/muse-mcp-desktop.png"
+done
+mkdir -p "$ICONS/512x512/apps"
+[ -f "$ICONS/512x512/apps/muse-mcp-desktop.png" ] || cp "$APP_ICON" "$ICONS/512x512/apps/muse-mcp-desktop.png"
 cat > "$BIN" <<LAUNCH
 #!/usr/bin/env bash
 exec "$ELECTRON" "$PREFIX" --ozone-platform-hint=auto "\$@"
@@ -44,9 +54,9 @@ cat > "$DESKTOP" <<ENTRY
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=Muse MCP Desktop
-GenericName=Muse con Master MCP
-Comment=Muse y el gestor de Master MCP en una sola app
+Name=Muse
+GenericName=Agente personal de IA
+Comment=Muse con el gestor de Master MCP integrado
 Exec=$BIN %U
 Icon=muse-mcp-desktop
 Terminal=false
