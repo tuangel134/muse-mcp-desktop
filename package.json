@@ -1,0 +1,69 @@
+{
+  "name": "muse-mcp-desktop",
+  "version": "0.1.0",
+  "description": "Muse + Master MCP en una sola app de escritorio: Muse en la ventana principal y un gestor de Master MCP (carpetas, permisos, ngrok, aprobaciones) en un panel lateral.",
+  "license": "MIT",
+  "author": "muse-mcp-desktop contributors",
+  "main": "electron/main.js",
+  "private": true,
+  "scripts": {
+    "build:host": "node scripts/build-host.mjs",
+    "start": "npm run build:host && electron .",
+    "test": "node --test test/",
+    "dist": "npm run build:host && electron-builder --publish never",
+    "dist:linux": "npm run build:host && electron-builder --linux --publish never",
+    "dist:win": "npm run build:host && electron-builder --win --publish never"
+  },
+  "dependencies": {
+    "@ngrok/ngrok": "^1.7.0"
+  },
+  "devDependencies": {
+    "electron": "^43.8.4",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2"
+  },
+  "build": {
+    "appId": "dev.musemcp.desktop",
+    "productName": "Muse MCP Desktop",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**",
+      "panel/**",
+      "prompts/**",
+      "host/host.cjs",
+      "package.json",
+      "LICENSE*",
+      "THIRD_PARTY.md"
+    ],
+    "asarUnpack": [
+      "node_modules/@ngrok/**"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility",
+      "icon": "build/icon.png",
+      "maintainer": "muse-mcp-desktop contributors <muse-mcp-desktop@users.noreply.github.com>"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "homepage": "https://github.com/tuangel134/muse-mcp-desktop",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tuangel134/muse-mcp-desktop.git"
+  }
+}

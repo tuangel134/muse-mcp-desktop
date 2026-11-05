@@ -1,0 +1,5 @@
+node_modules/
+dist/
+host/host.cjs
+*.log
+.DS_Store
