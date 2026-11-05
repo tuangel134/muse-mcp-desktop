@@ -35,8 +35,9 @@ dentro de la app; no hace falta instalar ni configurar nada más.
   aprobación manual, por carpeta y por permiso, y se puede revocar en cualquier momento.
 - Permisos de riesgo elevado (terminal del host, sudo, SSH, Docker, sistema, dispositivos) vienen **apagados**.
 - La terminal clasifica cada comando antes de ejecutarlo. Se permiten lecturas, ediciones y borrados normales dentro de
-  carpetas de trabajo; se rechazan `sudo`, `dd`/`mkfs`, `chmod/chown` amplios, `curl | sh`, `git push`, instalar
-  paquetes del sistema, y borrar `/`, tu carpeta personal, `~/.ssh`, `~/.config`, el sistema, etc. En Linux los
+  carpetas de trabajo; se rechazan `chmod/chown` amplios, `curl | sh`, `git push`, y borrar `/`, tu carpeta personal,
+  `~/.ssh`, `~/.config`, el sistema, etc. `sudo` y los gestores de paquetes se desbloquean con el permiso **Solicitar
+  sudo**, y `dd`/`mkfs`/`fdisk` con **Sistema y discos** (ambos apagados por defecto y solo con «Terminal del host»). En Linux los
   comandos corren dentro de un sandbox (`bubblewrap`, instálalo con tu gestor de paquetes si falta).
 - Una IA conectada puede actuar con tus permisos dentro de lo que apruebes: concede lo mínimo que necesites.
   El software se ofrece **sin garantía** (ver `LICENSE`).

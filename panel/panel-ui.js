@@ -6,11 +6,11 @@ const PERMS = [
   ["forja:protected-files", "Archivos protegidos", "Permite leer .env y credenciales del proyecto. Solo para un conector de máxima confianza."],
   ["forja:host-terminal", "Terminal del host", "Permite comandos fuera del sandbox, con tus permisos de usuario.", true],
   ["forja:devices", "Dispositivos USB / ADB", "Controla dispositivos Android por ADB. Requiere también Terminal del host.", true],
-  ["forja:system-write", "Sistema (/usr, /etc, /var)", "Permite modificar archivos del sistema desde la terminal del host.", true],
+  ["forja:system-write", "Sistema y discos (/usr, /etc, /var, dd, mkfs)", "Permite modificar archivos del sistema y usar dd, mkfs, fdisk y parted desde la terminal del host. Un error puede borrar un disco.", true],
   ["forja:ssh", "Claves SSH", "Permite usar ~/.ssh desde comandos autorizados.", true],
   ["forja:docker", "Docker del host", "Permite usar Docker y su socket local.", true],
   ["forja:mounts", "Unidades montadas", "Permite acceder a /mnt y /media.", true],
-  ["forja:sudo", "Solicitar sudo", "Permite ejecutar sudo; Linux seguirá pidiendo tu contraseña.", true]
+  ["forja:sudo", "Solicitar sudo", "Permite sudo y gestionar paquetes del sistema (pacman, apt…). Linux seguirá pidiendo tu contraseña; las rutas protegidas siguen bloqueadas.", true]
 ];
 const HIGH = new Set(PERMS.filter(p => p[3]).map(p => p[0]));
 const LABEL = Object.fromEntries(PERMS.map(p => [p[0], p[1]]));

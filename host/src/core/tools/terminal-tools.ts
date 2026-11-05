@@ -12,6 +12,7 @@ import { pathExists } from '../platform/fsx.ts';
 import { join } from 'node:path';
 import { detectProject, verificationCommands } from './project-detect.ts';
 import { classifyCommand, decideApproval, RiskClass } from '../security/command-classifier.ts';
+import { stripSudo, unlockPrivileged } from '../security/privilege-unlock.ts';
 import type { SandboxOptions } from '../security/sandbox.ts';
 import { bool, int, objectSchema, requireValid, str } from './schema.ts';
 import type { Tool, ToolContext, ToolResult } from './types.ts';
@@ -74,7 +75,9 @@ async function gate(command: string, context: ToolContext): Promise<void> {
 			throw errors.denied('This connector does not have the "Solicitar elevación" permission.', { command });
 		}
 	}
-	const classification = classifyCommand(command);
+	// Los permisos «Solicitar sudo» y «Sistema» del conector desbloquean sudo/paquetes y dd/mkfs respectivamente.
+	const unlocks = { sudo: Boolean(context.hostTerminalPermissions?.sudo), disk: Boolean(context.hostTerminalPermissions?.systemWrite) };
+	const classification = unlockPrivileged(classifyCommand(unlocks.sudo ? stripSudo(command) : command), unlocks);
 	const decision = decideApproval(
 		classification,
 		context.settings.security.terminalPolicy,
