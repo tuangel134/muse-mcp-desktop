@@ -40,11 +40,17 @@ APP_ICON="${MUSE_ICON:-}"
 [ -z "$APP_ICON" ] && [ -f "$OLD_MUSE_ICON" ] && APP_ICON="$OLD_MUSE_ICON"
 [ -z "$APP_ICON" ] && APP_ICON="$SRC/build/icon.png"
 cp "$APP_ICON" "$PREFIX/build/icon.png"
-for dir in "$ICONS"/*/apps; do   # mismos tamaños que el icono «muse» existente, si los hay
-    [ -f "$dir/muse.png" ] && cp "$dir/muse.png" "$dir/muse-mcp-desktop.png"
+rm -f "$ICONS"/*/apps/muse-mcp-desktop.png
+for size in 16 24 32 48 64 128 256 512; do   # un tamaño por carpeta del tema (con Pillow; sin él solo 512)
+    dir="$ICONS/${size}x${size}/apps"; mkdir -p "$dir"
+    if python3 -c "import PIL" 2>/dev/null; then
+        python3 - "$APP_ICON" "$dir/muse-mcp-desktop.png" "$size" <<'PY'
+import sys
+from PIL import Image
+Image.open(sys.argv[1]).convert("RGBA").resize((int(sys.argv[3]),) * 2, Image.LANCZOS).save(sys.argv[2])
+PY
+    elif [ "$size" = 512 ]; then cp "$APP_ICON" "$dir/muse-mcp-desktop.png"; fi
 done
-mkdir -p "$ICONS/512x512/apps"
-[ -f "$ICONS/512x512/apps/muse-mcp-desktop.png" ] || cp "$APP_ICON" "$ICONS/512x512/apps/muse-mcp-desktop.png"
 cat > "$BIN" <<LAUNCH
 #!/usr/bin/env bash
 exec "$ELECTRON" "$PREFIX" --ozone-platform-hint=auto "\$@"
@@ -67,4 +73,4 @@ StartupNotify=true
 ENTRY
 command -v update-desktop-database >/dev/null && update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
 command -v gtk-update-icon-cache >/dev/null && gtk-update-icon-cache -q -t "$HOME/.local/share/icons/hicolor" 2>/dev/null || true
-echo "Instalada en $PREFIX. Ábrela desde el menú («Muse MCP Desktop») o con: muse-mcp-desktop"
+echo "Instalada en $PREFIX. Ábrela desde el menú («Muse») o con: muse-mcp-desktop"

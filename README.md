@@ -6,7 +6,8 @@ guía con el resto. El Master MCP (archivos, búsqueda, git, terminal y navegado
 dentro de la app; no hace falta instalar ni configurar nada más.
 
 > Proyecto independiente y de código abierto. **No está afiliado ni respaldado por Meta.** La app solo abre el sitio
-> web público de Muse en su propia ventana; necesitas tu propia cuenta de Muse.
+> web público de Muse en su propia ventana; necesitas tu propia cuenta de Muse. «Muse» y su logotipo son marcas de Meta
+> (ver `THIRD_PARTY.md`).
 
 > ⚠️ **Windows: beta, sin probar.** Los instaladores de Windows se generan en GitHub Actions y el autor no ha podido
 > probarlos en un equipo Windows real. En Windows no hay sandbox para la terminal: solo funciona con el permiso
