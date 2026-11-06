@@ -20,7 +20,7 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm run build:host
-      - run: node --test test/
+      - run: npm test
       - run: node host/tests/e2e.mjs
 
   package:

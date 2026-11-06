@@ -9,7 +9,7 @@
   "scripts": {
     "build:host": "node scripts/build-host.mjs",
     "start": "npm run build:host && electron .",
-    "test": "node --test test/",
+    "test": "node --test \"test/*.test.mjs\"",
     "dist": "npm run build:host && electron-builder --publish never",
     "dist:linux": "npm run build:host && electron-builder --linux --publish never",
     "dist:win": "npm run build:host && electron-builder --win --publish never"
