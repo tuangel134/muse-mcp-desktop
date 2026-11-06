@@ -1,4 +1,24 @@
-> **Código de referido de Muse: `S1JLLM`**
+<div align="center">
+
+## 🎁 ¡Únete a Muse con mi código de invitación y gana 1,000,000 de tokens!
+
+# `S1JLLM`
+
+| 👤 Tú ganas | 👥 Yo gano |
+|:---:|:---:|
+| **1,000,000** tokens de Muse | **1,000,000** tokens de Muse |
+
+</div>
+
+**Cómo funciona**
+
+1. Crea tu cuenta en Muse.
+2. Canjea el código **`S1JLLM`** en **Configuración** dentro de tus **primeras 48 horas**.
+3. Ambos recibimos la recompensa.
+
+<sub>Es mi código de invitación personal; el programa de recompensas lo gestiona Muse y sus condiciones pueden cambiar.</sub>
+
+---
 
 <div align="center">
 
