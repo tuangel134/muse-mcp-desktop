@@ -59,7 +59,8 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
-    }
+    },
+    "artifactName": "Muse-MCP-Desktop-${version}-${os}.${ext}"
   },
   "homepage": "https://github.com/tuangel134/muse-mcp-desktop",
   "repository": {
